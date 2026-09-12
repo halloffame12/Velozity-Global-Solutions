@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PROJECT_MANAGER
+  DEVELOPER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(DEVELOPER)
+  isOnline      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  projectsCreated     Project[]        @relation("ProjectCreator")
+  tasksAssigned       Task[]
+  activityLogs        ActivityLog[]
+  notifications       Notification[]
+  refreshTokens       RefreshToken[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isOnline])
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  projects Project[]
+
+  @@index([email])
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  clientId    String
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  client      Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdBy   User             @relation("ProjectCreator", fields: [createdById], references: [id])
+  tasks       Task[]
+  activityLogs ActivityLog[]
+
+  @@index([clientId])
+  @@index([createdById])
+  @@index([createdAt])
+}
+
+model Task {
+  id                String      @id @default(uuid())
+  title             String
+  description       String?
+  projectId         String
+  assignedDeveloperId String?
+  status            TaskStatus  @default(TODO)
+  priority          TaskPriority @default(MEDIUM)
+  dueDate           DateTime?
+  isOverdue         Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  project           Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedDeveloper  User?               @relation(fields: [assignedDeveloperId], references: [id])
+  activityLogs      ActivityLog[]
+  notifications     Notification[]
+
+  @@index([projectId])
+  @@index([assignedDeveloperId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([isOverdue])
+  @@index([createdAt])
+  @@index([status, dueDate, isOverdue])
+}
+
+model ActivityLog {
+  id            String    @id @default(uuid())
+  projectId     String
+  taskId        String?
+  userId        String
+  action        String
+  previousStatus String?
+  newStatus     String?
+  createdAt     DateTime  @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task      Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@index([taskId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([projectId, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task  Task?  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String?
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([userId, isRead])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

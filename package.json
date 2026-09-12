@@ -1,0 +1,10 @@
+{
+  "name": "agency-project-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-Time Client Project Dashboard for a software agency",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
