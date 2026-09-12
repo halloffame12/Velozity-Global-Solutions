@@ -4,9 +4,8 @@ services:
     runtime: node
     repo: https://github.com/halloffame12/Velozity-Global-Solutions
     rootDir: apps/api
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npx prisma generate && npm run build && npx prisma migrate deploy
     startCommand: npm run start
-    preDeployCommand: npx prisma migrate deploy
     healthCheckPath: /health
     autoDeploy: true
     envVars:
