@@ -12,10 +12,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-        sync: false
       - key: CLIENT_URL
         value: https://velozity-web.vercel.app
-        sync: false
       - key: DATABASE_URL
         sync: false
       - key: JWT_ACCESS_SECRET
