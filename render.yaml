@@ -12,7 +12,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: CLIENT_URL
-        value: https://velozity-web.vercel.app
+        value: https://dist-jade-tau.vercel.app
       - key: DATABASE_URL
         sync: false
       - key: JWT_ACCESS_SECRET
