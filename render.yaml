@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: velozity-api
+    runtime: node
+    repo: https://github.com/halloffame12/Velozity-Global-Solutions
+    rootDir: apps/api
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    preDeployCommand: npx prisma migrate deploy
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+        sync: false
+      - key: CLIENT_URL
+        value: https://velozity-web.vercel.app
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false

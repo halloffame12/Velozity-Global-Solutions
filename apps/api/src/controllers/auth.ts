@@ -10,7 +10,7 @@ function cookieBaseOptions() {
   const isProd = NODE_ENV === 'production';
   return {
     httpOnly: true,
-    sameSite: 'strict' as const,
+    sameSite: (isProd ? 'none' : 'strict') as 'none' | 'strict',
     secure: isProd,
     path: '/',
   };
@@ -29,12 +29,7 @@ function setRefreshCookie(res: Response, token: string) {
 }
 
 function clearRefreshCookie(res: Response) {
-  res.clearCookie(REFRESH_COOKIE, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: NODE_ENV === 'production',
-    path: '/',
-  });
+  res.clearCookie(REFRESH_COOKIE, cookieBaseOptions());
 }
 
 export const loginHandler = asyncHandler(async (req: AuthenticatedRequest, res) => {

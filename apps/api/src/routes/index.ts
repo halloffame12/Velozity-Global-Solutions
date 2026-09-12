@@ -22,6 +22,10 @@ router.use('/users', userRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/', presenceRoutes);
 
+router.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
 router.use(notFoundHandler);
 
 export { router as routes, errorHandler };
