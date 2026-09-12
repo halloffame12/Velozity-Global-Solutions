@@ -17,6 +17,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+app.get('/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok' });
+});
+
 app.use('/api', routes);
 
 app.use(errorHandler);
